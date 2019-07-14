@@ -14,16 +14,19 @@ import com.kata.checkoutorder.model.WeightedProduct;
 public class TransactionTest {
 	
 	Transaction testTransaction;
+	Product perUnitProduct;
+	Product weightedProduct;
 	
 	@Before
 	public void setup() {
 		testTransaction = new Transaction();
+		perUnitProduct = new Product("soup", new BigDecimal("1.22"));
+		weightedProduct = new WeightedProduct("bananas", new BigDecimal("1.50"), new BigDecimal("2"));
 	}
 
 	@Test
 	public void testScanItem_canAddProduct() {
-		Product item = new Product("soup", new BigDecimal("1.22"));
-		testTransaction.scanProduct(item);
+		testTransaction.scanProduct(perUnitProduct);
 		
 		assertEquals(1, testTransaction.getProducts().size());
 		
@@ -31,8 +34,7 @@ public class TransactionTest {
 	
 	@Test
 	public void testScanItem_canAddWeightedProduct() {
-		Product item = new WeightedProduct("bananas", new BigDecimal("1.50"), new BigDecimal("2"));
-		testTransaction.scanProduct(item);
+		testTransaction.scanProduct(weightedProduct);
 		
 		assertEquals(1, testTransaction.getProducts().size());
 		assertEquals(new BigDecimal("3.00"), testTransaction.getTotal());
@@ -40,8 +42,7 @@ public class TransactionTest {
 	
 	@Test
 	public void testScanItem_canAddProductAndUpdateTotal() {
-		Product item = new Product("soup", new BigDecimal("1.22"));
-		testTransaction.scanProduct(item);
+		testTransaction.scanProduct(perUnitProduct);
 		
 		assertEquals(new BigDecimal("1.22"), testTransaction.getTotal());
 		
@@ -49,11 +50,8 @@ public class TransactionTest {
 	
 	@Test
 	public void testScanItem_canAddMultipleProductsAndUpdateTotal() {
-		Product item = new Product("soup", new BigDecimal("1.22"));
-		testTransaction.scanProduct(item);
-		
-		Product weightedItem = new WeightedProduct("bananas", new BigDecimal("1.50"), new BigDecimal("2"));
-		testTransaction.scanProduct(weightedItem);
+		testTransaction.scanProduct(perUnitProduct);
+		testTransaction.scanProduct(weightedProduct);
 		
 		assertEquals(new BigDecimal("4.22"), testTransaction.getTotal());
 		
@@ -61,9 +59,8 @@ public class TransactionTest {
 	
 	@Test
 	public void testScanItem_canAddMarkdownedProduct() {
-		Product item = new Product("soup", new BigDecimal("1.22"));
-		item.setMarkdown(new BigDecimal("0.50"));
-		testTransaction.scanProduct(item);
+		perUnitProduct.setMarkdown(new BigDecimal("0.50"));
+		testTransaction.scanProduct(perUnitProduct);
 		
 		assertEquals(new BigDecimal("0.72"), testTransaction.getTotal());
 		
