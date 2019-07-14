@@ -1,8 +1,10 @@
-package com.kata.derekmesser.business;
+package com.kata.checkoutorder.business;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import com.kata.checkoutorder.business.Transaction;
 
 public class TransactionTest {
 
