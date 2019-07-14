@@ -2,6 +2,11 @@ package com.kata.checkoutorder.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Subclass of Product that has a weight to account for different price calculation.
+ * @author Derek Messer
+ *
+ */
 public class WeightedProduct extends Product {
 	BigDecimal pounds;
 	
@@ -10,9 +15,14 @@ public class WeightedProduct extends Product {
 		this.pounds = pounds;
 	}
 	
+	/**
+	 * Multiplies the price/weight by weight to get final price.
+	 * 
+	 * returns BigDecimal price of item with weight;
+	 */
 	@Override
 	public BigDecimal getPrice() {
-		return price.multiply(pounds);
+		return (price.subtract(markdown)).multiply(pounds);
 	}
 
 }

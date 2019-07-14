@@ -30,7 +30,7 @@ public class TransactionTest {
 	}
 	
 	@Test
-	public void testScanWeightedItem_canAddWeightedProduct() {
+	public void testScanItem_canAddWeightedProduct() {
 		Product item = new WeightedProduct("bananas", new BigDecimal("1.50"), new BigDecimal("2"));
 		testTransaction.scanProduct(item);
 		
@@ -39,7 +39,7 @@ public class TransactionTest {
 	}
 	
 	@Test
-	public void testCalculateTotal_canAddProductAndUpdateTotal() {
+	public void testScanItem_canAddProductAndUpdateTotal() {
 		Product item = new Product("soup", new BigDecimal("1.22"));
 		testTransaction.scanProduct(item);
 		
@@ -48,7 +48,7 @@ public class TransactionTest {
 	}
 	
 	@Test
-	public void testCalculateTotal_canAddMultipleProductsAndUpdateTotal() {
+	public void testScanItem_canAddMultipleProductsAndUpdateTotal() {
 		Product item = new Product("soup", new BigDecimal("1.22"));
 		testTransaction.scanProduct(item);
 		
@@ -56,6 +56,16 @@ public class TransactionTest {
 		testTransaction.scanProduct(weightedItem);
 		
 		assertEquals(new BigDecimal("4.22"), testTransaction.getTotal());
+		
+	}
+	
+	@Test
+	public void testScanItem_canAddMarkdownedProduct() {
+		Product item = new Product("soup", new BigDecimal("1.22"));
+		item.setMarkdown(new BigDecimal("0.50"));
+		testTransaction.scanProduct(item);
+		
+		assertEquals(new BigDecimal("0.72"), testTransaction.getTotal());
 		
 	}
 

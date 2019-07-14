@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public class Product {
 	String name;
 	BigDecimal price;
+	BigDecimal markdown;
 	
 	public Product() {
 	}
@@ -16,6 +17,7 @@ public class Product {
 	public Product(String name, BigDecimal price) {
 		this.name = name;
 		this.price = price;
+		markdown = new BigDecimal(0);
 	}
 
 	public String getName() {
@@ -27,11 +29,19 @@ public class Product {
 	}
 
 	public BigDecimal getPrice() {
-		return price;
+		return price.subtract(markdown);
 	}
 
 	public void setPrice(BigDecimal price) {
 		this.price = price;
+	}
+
+	public BigDecimal getMarkdown() {
+		return markdown;
+	}
+
+	public void setMarkdown(BigDecimal markdown) {
+		this.markdown = markdown;
 	}
 	
 	
