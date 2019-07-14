@@ -1,5 +1,6 @@
 package com.kata.checkoutorder.business;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,16 @@ public class Transaction {
 
 	public List<Product> getProducts() {
 		return products;
+	}
+
+	public BigDecimal calculateTotal() {
+		BigDecimal preTaxTotal = new BigDecimal(0);
+		
+		for(Product item : products) {
+			preTaxTotal = preTaxTotal.add(item.getPrice());
+		}
+		
+		return preTaxTotal;
 	}
 
 }
