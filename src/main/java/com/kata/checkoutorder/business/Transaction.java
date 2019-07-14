@@ -3,17 +3,19 @@ package com.kata.checkoutorder.business;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kata.checkoutorder.model.Product;
+
 public class Transaction {
 
-	List<String> items = new ArrayList<String>();
+	List<Product> products = new ArrayList<Product>();
 	
-	public void scanItem(String item) {
-		items.add(item);
+	public void scanProduct(Product item) {
+		products.add(item);
 		
 	}
 
-	public List<String> getItems() {
-		return items;
+	public List<Product> getProducts() {
+		return products;
 	}
 
 }
