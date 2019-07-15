@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.kata.checkoutorder.business.Transaction;
 import com.kata.checkoutorder.model.Product;
+import com.kata.checkoutorder.model.Special;
 import com.kata.checkoutorder.model.WeightedProduct;
 
 public class TransactionTest {
@@ -64,6 +65,37 @@ public class TransactionTest {
 		
 		assertEquals(new BigDecimal("0.72"), testTransaction.getTotal());
 		
+	}
+	
+	@Test
+	public void testScanItem_canAddMarkdownedWeightedProduct() {
+		weightedProduct.setMarkdown(new BigDecimal("0.50"));
+		testTransaction.scanProduct(weightedProduct);
+		
+		assertEquals(new BigDecimal("2.00"), testTransaction.getTotal());
+		
+	}
+	
+	@Test
+	public void testScanItem_canApplyPercentDiscountSpecialBuyThreeGetOneFree() {
+		//Construct Special parameters
+		String itemName = "soup";
+		BigDecimal itemPrice = perUnitProduct.getPrice();
+		int numItemsRequiredToFulfillSpecial = 3;
+		int numDiscounted = 1;
+		BigDecimal percentOff = new BigDecimal("1");
+		Special percentDiscount = new Special(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
+		
+		//add special to transaction
+		testTransaction.addSpecial(percentDiscount);
+		
+		//setup scenario to fulfill special (3 full price, 1 free)
+		testTransaction.scanProduct(perUnitProduct);
+		testTransaction.scanProduct(perUnitProduct);
+		testTransaction.scanProduct(perUnitProduct);
+		testTransaction.scanProduct(perUnitProduct);
+		
+		assertEquals(new BigDecimal("3.66"), testTransaction.getTotal());
 	}
 
 }
