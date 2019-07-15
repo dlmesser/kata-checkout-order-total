@@ -24,6 +24,12 @@ public class TransactionTest {
 		perUnitProduct = new Product("soup", new BigDecimal("1.22"));
 		weightedProduct = new WeightedProduct("bananas", new BigDecimal("1.50"), new BigDecimal("2"));
 	}
+	
+	private void transactionSecnarioBuilder(Product product, int numToScan) {
+		for(int i = 0; i < numToScan; i++) {
+			testTransaction.scanProduct(perUnitProduct);
+		}
+	}
 
 	@Test
 	public void testScanItem_canAddProduct() {
@@ -90,10 +96,7 @@ public class TransactionTest {
 		testTransaction.addSpecial(percentDiscount);
 		
 		//setup scenario to fulfill special (3 full price, 1 free)
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
+		this.transactionSecnarioBuilder(perUnitProduct, 4);
 		
 		assertEquals(new BigDecimal("3.66"), testTransaction.getTotal());
 	}
@@ -109,11 +112,7 @@ public class TransactionTest {
 		Special percentDiscount = new Special(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
 
 		//setup scenario to fulfill special (3 full price, 1 free)
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
-
+		this.transactionSecnarioBuilder(perUnitProduct, 4);
 
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
@@ -136,9 +135,7 @@ public class TransactionTest {
 		testTransaction.addSpecial(percentDiscount);
 		
 		//setup scenario to fulfill special (6 full price, 2 free)
-		for(int i = 0; i < 8; i++) {
-			testTransaction.scanProduct(perUnitProduct);
-		}
+		this.transactionSecnarioBuilder(perUnitProduct, 8);
 	
 		assertEquals(new BigDecimal("6.00"), testTransaction.getTotal());
 	}
@@ -160,17 +157,16 @@ public class TransactionTest {
 		testTransaction.addSpecial(percentDiscount);
 		
 		//setup scenario to fulfill Buy 3 get 2 free special (3 full price, 2 free)
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
+		this.transactionSecnarioBuilder(perUnitProduct, 3);
 	
 		assertEquals(new BigDecimal("3.00"), testTransaction.getTotal());
 		
-		testTransaction.scanProduct(perUnitProduct);
-		testTransaction.scanProduct(perUnitProduct);
+		//2 free
+		this.transactionSecnarioBuilder(perUnitProduct, 2);
 		
 		assertEquals(new BigDecimal("3.00"), testTransaction.getTotal());
 		
+		//adding another is full price
 		testTransaction.scanProduct(perUnitProduct);
 		
 		assertEquals(new BigDecimal("4.00"), testTransaction.getTotal());
