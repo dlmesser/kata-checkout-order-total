@@ -71,11 +71,17 @@ public class Transaction {
 					int currentItemsDiscounted = 0;
 					int currentItemsFullPrice = 0;
 					for (int i = 0; i < currentProductCount; i++) {
-						//for every N at full price, discount 1
-						if (currentItemsFullPrice % numberOfProductRequiredToGetDiscount == 0) {
-							currentItemsDiscounted++;
-							i++;
+						//for every N at full price, discount M
+						if (currentItemsFullPrice != 0 && currentItemsFullPrice % numberOfProductRequiredToGetDiscount == 0) {
+							for(int j = 0; j < special.getNumDiscountedPer(); j++) {
+								//make sure to not mark more discounted than exist....
+								if (i < currentProductCount) {
+									currentItemsDiscounted++;
+									i++;
+								}
+							}
 						}
+						
 						currentItemsFullPrice++;
 					}
 					
