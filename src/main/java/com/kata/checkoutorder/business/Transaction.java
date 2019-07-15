@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.kata.checkoutorder.model.Product;
 import com.kata.checkoutorder.model.Special;
+import com.kata.checkoutorder.model.PercentOffSpecial;
 
 /**
  * Transaction class that represents the API for scanning
@@ -62,34 +63,7 @@ public class Transaction {
 		}
 		
 		for(Special special : specials) {
-			//if we have any of that item special applies to
-			if(productCounts.containsKey(special.getProductName())) {
-				int currentProductCount = productCounts.get(special.getProductName());
-				int numberOfProductRequiredToGetDiscount = special.getNumProductPer();
-				//if we have enough of that item to fulfill special requirements
-				if(numberOfProductRequiredToGetDiscount < currentProductCount) {
-					int currentItemsDiscounted = 0;
-					int currentItemsFullPrice = 0;
-					for (int i = 0; i < currentProductCount; i++) {
-						//for every N at full price, discount M
-						if (currentItemsFullPrice != 0 && currentItemsFullPrice % numberOfProductRequiredToGetDiscount == 0) {
-							for(int j = 0; j < special.getNumDiscountedPer(); j++) {
-								//make sure to not mark more discounted than exist....
-								if (i < currentProductCount) {
-									currentItemsDiscounted++;
-									i++;
-								}
-							}
-						}
-						
-						currentItemsFullPrice++;
-					}
-					
-					//subtract discounted price * number that should have been discounted from price total
-					BigDecimal percentOffPrice = special.getProductPrice().multiply(special.getPercentOffAsDecimal());
-					preTaxTotal = preTaxTotal.subtract(percentOffPrice.multiply(new BigDecimal(currentItemsDiscounted)));
-				}
-			}
+			preTaxTotal = special.updateTotalWithSpecialDiscountValue(productCounts, preTaxTotal);
 		}
 		
 		
@@ -98,10 +72,10 @@ public class Transaction {
 
 	/**
 	 * Adds a special to the current transaction.
-	 * @param special - a discount rule for a particular item
+	 * @param percentDiscount - a discount rule for a particular item
 	 */
-	public void addSpecial(Special special) {
-		specials.add(special);
+	public void addSpecial(Special percentDiscount) {
+		specials.add(percentDiscount);
 		updateTotal();
 	}
 	

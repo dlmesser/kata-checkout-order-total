@@ -8,8 +8,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.kata.checkoutorder.business.Transaction;
+import com.kata.checkoutorder.model.ExactPriceSpecial;
 import com.kata.checkoutorder.model.Product;
 import com.kata.checkoutorder.model.Special;
+import com.kata.checkoutorder.model.PercentOffSpecial;
 import com.kata.checkoutorder.model.WeightedProduct;
 
 public class TransactionTest {
@@ -90,7 +92,7 @@ public class TransactionTest {
 		int numItemsRequiredToFulfillSpecial = 3;
 		int numDiscounted = 1;
 		BigDecimal percentOff = new BigDecimal("1");
-		Special percentDiscount = new Special(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
+		PercentOffSpecial percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
 		
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
@@ -109,7 +111,7 @@ public class TransactionTest {
 		int numItemsRequiredToFulfillSpecial = 3;
 		int numDiscounted = 1;
 		BigDecimal percentOff = new BigDecimal("1");
-		Special percentDiscount = new Special(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
+		PercentOffSpecial percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
 
 		//setup scenario to fulfill special (3 full price, 1 free)
 		this.transactionSecnarioBuilder(perUnitProduct, 4);
@@ -129,7 +131,7 @@ public class TransactionTest {
 		int numItemsRequiredToFulfillSpecial = 3;
 		int numDiscounted = 1;
 		BigDecimal percentOff = new BigDecimal("1");
-		Special percentDiscount = new Special(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
+		Special percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
 		
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
@@ -150,7 +152,7 @@ public class TransactionTest {
 		int numDiscountedPerFullPriceRequirement = 2;
 		BigDecimal percentOff = new BigDecimal("1");
 		
-		Special percentDiscount = new Special(itemName, itemPrice, numItemsRequiredToFulfillSpecial, 
+		Special percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, 
 											numDiscountedPerFullPriceRequirement, percentOff);
 		
 		//add special to transaction
@@ -172,7 +174,25 @@ public class TransactionTest {
 		assertEquals(new BigDecimal("4.00"), testTransaction.getTotal());
 	}
 	
-	
+	@Test
+	public void testAddExactPriceSpecial_canApplyExactPriceSpecial() {
+		//Construct Special parameters
+		String itemName = "soup";
+		BigDecimal itemPrice = perUnitProduct.getPrice();
+		int numItemsRequiredToFulfillSpecial = 3;
+		BigDecimal discountPrice = new BigDecimal("5");
+		Special exactPriceDiscount = new ExactPriceSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, discountPrice);
+
+		//setup scenario to fulfill special (3 for $5, 1 full price)
+		this.transactionSecnarioBuilder(perUnitProduct, 4);
+
+
+		//add special to transaction
+		testTransaction.addSpecial(exactPriceDiscount);
+		
+		// 3 for 5 + 1.22 (P.S. - this is a terrible deal)
+		assertEquals(new BigDecimal("6.22"), testTransaction.getTotal());
+	}
 	
 
 }
