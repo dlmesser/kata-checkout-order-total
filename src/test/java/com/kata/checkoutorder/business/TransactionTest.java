@@ -194,5 +194,15 @@ public class TransactionTest {
 		assertEquals(new BigDecimal("6.22"), testTransaction.getTotal());
 	}
 	
+	@Test
+	public void testRemoveProduct_canRemoveProductAndUpdateTotal() {
+		this.transactionSecnarioBuilder(perUnitProduct, 4);
+		assertEquals(new BigDecimal("4.88"), testTransaction.getTotal());
+		
+		testTransaction.removeProduct(perUnitProduct);
+		assertEquals(new BigDecimal("3.66"), testTransaction.getTotal());
+		
+	}
+	
 
 }

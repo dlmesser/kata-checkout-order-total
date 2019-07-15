@@ -79,6 +79,19 @@ public class Transaction {
 		updateTotal();
 	}
 	
+	public void removeProduct(Product product) {
+		String productName = product.getName();
+		if(products.remove(product)) {
+			if(productCounts.get(productName) == 1) {
+				productCounts.remove(productName);
+			} else {
+				productCounts.put(productName, productCounts.get(productName) - 1);
+			}
+			
+			updateTotal();
+		}
+	}
+	
 	public BigDecimal getTotal() {
 		return total;
 	}
