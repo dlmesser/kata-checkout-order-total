@@ -28,9 +28,7 @@ public class ExactPriceSpecial extends Special {
 	@Override
 	public BigDecimal determineDiscountProductCount(int productCount) {
 		
-		if (limit == null) {
-			limit = new Integer(productCount);
-		}
+		limit = this.hasProductLimit ? limit : productCount;
 		
 		int currentItemsDiscounted = 0;
 		

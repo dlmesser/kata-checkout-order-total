@@ -17,7 +17,10 @@ public abstract class Special {
 	protected int numDiscountedPer = 1;
 	
 	/** Limit on product count that can apply to this special. */
-	protected Integer limit;
+	protected int limit;
+	
+	/** Identifier for if a product has a set limit default value false. */
+	protected boolean hasProductLimit = false;
 	
 	protected Special(String productName, BigDecimal productPrice, int numProductsRequired, int numDiscounted) {
 		this.productName = productName;
@@ -100,12 +103,13 @@ public abstract class Special {
 		return productPrice;
 	}
 
-	public Integer getLimit() {
+	public int getLimit() {
 		return limit;
 	}
 
-	public void setLimit(Integer limit) {
+	public void setLimit(int limit) {
 		this.limit = limit;
+		this.hasProductLimit = true;
 	}
 	
 	
