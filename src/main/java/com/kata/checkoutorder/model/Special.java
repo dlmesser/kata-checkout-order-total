@@ -16,6 +16,8 @@ public abstract class Special {
 	 */
 	protected int numDiscountedPer = 1;
 	
+	protected int limit;
+	
 	protected Special(String productName, BigDecimal productPrice, int numProductsRequired, int numDiscounted) {
 		this.productName = productName;
 		this.productPrice = productPrice;
@@ -23,7 +25,20 @@ public abstract class Special {
 		this.numDiscountedPer = numDiscounted;
 	}
 	
+	/**
+	 * Method to retrieve the discounted price for a product and type of special
+	 * 
+	 * @return BigDecimal original product price - discount value of special
+	 */
 	public abstract BigDecimal determineDiscountPriceDifference();
+	
+	/**
+	 * Given a product count that applies to special, determine the number of times the
+	 * discount would apply.
+	 * 
+	 * @return number of discounted products in a given transaction special
+	 */
+	public abstract BigDecimal determineDiscountProductCount(int productCount);
 	
 	/**
 	 * Determine the number of times the special applies based on the product counts and calculate
@@ -37,30 +52,15 @@ public abstract class Special {
 	public BigDecimal updateTotalWithSpecialDiscountValue(HashMap<String, Integer> productCounts, BigDecimal preTaxTotal) {
 		//if we have any of that item special applies to
 		if(productCounts.containsKey(this.productName)) {
-			int currentProductCount = productCounts.get(this.productName);
+			int specialProductCount = productCounts.get(this.productName);
 			int numberOfProductRequiredToGetDiscount = this.numProductPer;
 			//if we have enough of that item to fulfill special requirements
-			if(numberOfProductRequiredToGetDiscount < currentProductCount) {
-				int currentItemsDiscounted = 0;
-				int currentItemsFullPrice = 0;
-				for (int i = 0; i < currentProductCount; i++) {
-					//for every N at full price, discount M
-					if (currentItemsFullPrice != 0 && currentItemsFullPrice % numberOfProductRequiredToGetDiscount == 0) {
-						for(int j = 0; j < this.numDiscountedPer; j++) {
-							//make sure to not mark more discounted than exist....
-							if (i < currentProductCount) {
-								currentItemsDiscounted++;
-								i++;
-							}
-						}
-					}
-					
-					currentItemsFullPrice++;
-				}
+			if(numberOfProductRequiredToGetDiscount < specialProductCount) {
 				
 				//subtract discounted price difference * number that should have been discounted from price total
 				BigDecimal dicountPriceDifference = this.determineDiscountPriceDifference();
-				preTaxTotal = preTaxTotal.subtract(dicountPriceDifference.multiply(new BigDecimal(currentItemsDiscounted)));
+				BigDecimal countProductsDiscounted = this.determineDiscountProductCount(specialProductCount);
+				preTaxTotal = preTaxTotal.subtract(dicountPriceDifference.multiply(countProductsDiscounted));
 			}
 		}
 		
@@ -91,7 +91,21 @@ public abstract class Special {
 		this.numDiscountedPer = numDiscounted;
 	}
 	
+	public void setProductPrice(BigDecimal productPrice) {
+		this.productPrice = productPrice;
+	}
+
 	public BigDecimal getProductPrice() {
 		return productPrice;
 	}
+
+	public int getLimit() {
+		return limit;
+	}
+
+	public void setLimit(int limit) {
+		this.limit = limit;
+	}
+	
+	
 }

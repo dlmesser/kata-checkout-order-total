@@ -16,15 +16,28 @@ import com.kata.checkoutorder.model.WeightedProduct;
 
 public class TransactionTest {
 	
-	Transaction testTransaction;
-	Product perUnitProduct;
-	Product weightedProduct;
+	private Transaction testTransaction;
+	private Product perUnitProduct;
+	private Product weightedProduct;
+	
+	private Special exactPriceDiscount;
+	private Special percentDiscount; 
 	
 	@Before
 	public void setup() {
 		testTransaction = new Transaction();
 		perUnitProduct = new Product("soup", new BigDecimal("1.22"));
 		weightedProduct = new WeightedProduct("bananas", new BigDecimal("1.50"), new BigDecimal("2"));
+		
+		String itemName = "soup";
+		BigDecimal itemPrice = perUnitProduct.getPrice();
+		int numItemsRequiredToFulfillSpecial = 3;
+		int numDiscounted = 1;
+		BigDecimal percentOff = new BigDecimal("1");
+		percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
+		
+		BigDecimal discountPrice = new BigDecimal("5");
+		exactPriceDiscount = new ExactPriceSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, discountPrice);
 	}
 	
 	private void transactionSecnarioBuilder(Product product, int numToScan) {
@@ -86,14 +99,6 @@ public class TransactionTest {
 	
 	@Test
 	public void testAddSpecial_canApplyPercentDiscountSpecialBuyThreeGetOneFree() {
-		//Construct Special parameters
-		String itemName = "soup";
-		BigDecimal itemPrice = perUnitProduct.getPrice();
-		int numItemsRequiredToFulfillSpecial = 3;
-		int numDiscounted = 1;
-		BigDecimal percentOff = new BigDecimal("1");
-		PercentOffSpecial percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
-		
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
 		
@@ -105,14 +110,6 @@ public class TransactionTest {
 	
 	@Test
 	public void testAddSpecial_canApplySpecialAfterScanningItems() {
-		//Construct Special parameters
-		String itemName = "soup";
-		BigDecimal itemPrice = perUnitProduct.getPrice();
-		int numItemsRequiredToFulfillSpecial = 3;
-		int numDiscounted = 1;
-		BigDecimal percentOff = new BigDecimal("1");
-		PercentOffSpecial percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
-
 		//setup scenario to fulfill special (3 full price, 1 free)
 		this.transactionSecnarioBuilder(perUnitProduct, 4);
 
@@ -124,14 +121,9 @@ public class TransactionTest {
 	
 	@Test
 	public void testAddSpecial_canApplyPercentSpecialWithMultipleDiscountableProducts() {
-		//Construct Special parameters
-		String itemName = "soup";
+		//Change prices for my sanity
 		perUnitProduct.setPrice(new BigDecimal("1.00"));
-		BigDecimal itemPrice = perUnitProduct.getPrice();
-		int numItemsRequiredToFulfillSpecial = 3;
-		int numDiscounted = 1;
-		BigDecimal percentOff = new BigDecimal("1");
-		Special percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
+		percentDiscount.setProductPrice(new BigDecimal("1.00"));
 		
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
@@ -144,16 +136,12 @@ public class TransactionTest {
 
 	@Test
 	public void testAddSpecial_canApplyPercentWithMultipleDiscountedPerFullPriceRequirement() {
-		//Construct Special parameters
-		String itemName = "soup";
+		//Change prices for my sanity
 		perUnitProduct.setPrice(new BigDecimal("1.00"));
-		BigDecimal itemPrice = perUnitProduct.getPrice();
-		int numItemsRequiredToFulfillSpecial = 3;
-		int numDiscountedPerFullPriceRequirement = 2;
-		BigDecimal percentOff = new BigDecimal("1");
+		percentDiscount.setProductPrice(new BigDecimal("1.00"));
 		
-		Special percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, 
-											numDiscountedPerFullPriceRequirement, percentOff);
+		//update the M value to be more than 1
+		percentDiscount.setNumDiscountedPer(2);
 		
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
@@ -176,16 +164,8 @@ public class TransactionTest {
 	
 	@Test
 	public void testAddExactPriceSpecial_canApplyExactPriceSpecial() {
-		//Construct Special parameters
-		String itemName = "soup";
-		BigDecimal itemPrice = perUnitProduct.getPrice();
-		int numItemsRequiredToFulfillSpecial = 3;
-		BigDecimal discountPrice = new BigDecimal("5");
-		Special exactPriceDiscount = new ExactPriceSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, discountPrice);
-
 		//setup scenario to fulfill special (3 for $5, 1 full price)
 		this.transactionSecnarioBuilder(perUnitProduct, 4);
-
 
 		//add special to transaction
 		testTransaction.addSpecial(exactPriceDiscount);

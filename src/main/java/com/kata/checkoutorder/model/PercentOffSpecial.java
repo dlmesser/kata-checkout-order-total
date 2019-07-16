@@ -24,4 +24,25 @@ public class PercentOffSpecial extends Special {
 		return this.productPrice.multiply(this.percentOffAsDecimal);
 	}
 
+	@Override
+	public BigDecimal determineDiscountProductCount(int productCount) {
+		int currentItemsDiscounted = 0;
+		int currentItemsFullPrice = 0;
+		for (int i = 0; i < productCount; i++) {
+			//for every N at full price, discount M
+			if (currentItemsFullPrice != 0 && currentItemsFullPrice % this.numProductPer == 0) {
+				for(int j = 0; j < this.numDiscountedPer; j++) {
+					//make sure to not mark more discounted than exist....
+					if (i < productCount) {
+						currentItemsDiscounted++;
+						i++;
+					}
+				}
+			}
+			
+			currentItemsFullPrice++;
+		}
+		return new BigDecimal(currentItemsDiscounted);
+	}
+
 }
