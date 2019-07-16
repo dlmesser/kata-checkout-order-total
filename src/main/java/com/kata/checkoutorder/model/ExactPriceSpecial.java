@@ -27,12 +27,17 @@ public class ExactPriceSpecial extends Special {
 
 	@Override
 	public BigDecimal determineDiscountProductCount(int productCount) {
+		
+		if (limit == null) {
+			limit = new Integer(productCount);
+		}
+		
 		int currentItemsDiscounted = 0;
 		
 		for (int i = 1; i <= productCount; i++) {
 			//for every N at full price get for price X
 			if (i != 0 && i % this.numProductPer == 0) {
-				if (i <= productCount) {
+				if (i <= limit) {
 					currentItemsDiscounted++;
 				}
 			}

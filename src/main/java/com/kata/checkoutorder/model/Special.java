@@ -16,7 +16,8 @@ public abstract class Special {
 	 */
 	protected int numDiscountedPer = 1;
 	
-	protected int limit;
+	/** Limit on product count that can apply to this special. */
+	protected Integer limit;
 	
 	protected Special(String productName, BigDecimal productPrice, int numProductsRequired, int numDiscounted) {
 		this.productName = productName;
@@ -99,11 +100,11 @@ public abstract class Special {
 		return productPrice;
 	}
 
-	public int getLimit() {
+	public Integer getLimit() {
 		return limit;
 	}
 
-	public void setLimit(int limit) {
+	public void setLimit(Integer limit) {
 		this.limit = limit;
 	}
 	

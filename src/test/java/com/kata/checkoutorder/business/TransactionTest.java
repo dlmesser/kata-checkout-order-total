@@ -175,6 +175,23 @@ public class TransactionTest {
 	}
 	
 	@Test
+	public void testAddSpecial_canApplySpecialsWithLimits() {
+		//Change prices for my sanity
+		perUnitProduct.setPrice(new BigDecimal("1.00"));
+		exactPriceDiscount.setProductPrice(new BigDecimal("1.00"));
+				
+		//setup scenario so special will apply once instead of twice without limit
+		this.transactionSecnarioBuilder(perUnitProduct, 6);
+
+		//add special to transaction
+		exactPriceDiscount.setLimit(3);
+		testTransaction.addSpecial(exactPriceDiscount);
+		
+		// 3 for 5 + (3 * 1) (P.S. - this is still a terrible deal)
+		assertEquals(new BigDecimal("8").setScale(2), testTransaction.getTotal());
+	}
+	
+	@Test
 	public void testRemoveProduct_canRemoveProductAndUpdateTotal() {
 		this.transactionSecnarioBuilder(perUnitProduct, 4);
 		assertEquals(new BigDecimal("4.88"), testTransaction.getTotal());
