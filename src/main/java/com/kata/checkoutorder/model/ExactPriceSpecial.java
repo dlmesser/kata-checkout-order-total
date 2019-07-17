@@ -13,16 +13,15 @@ public class ExactPriceSpecial extends Special {
 	private BigDecimal newPrice;
 	
 	
-	public ExactPriceSpecial(String productName, BigDecimal productPrice, int numProductsRequired, 
-			BigDecimal newPrice) {
-		super(productName, productPrice, numProductsRequired, 1);
+	public ExactPriceSpecial(Product product, int numProductsRequired, BigDecimal newPrice) {
+		super(product, numProductsRequired, 1);
 		this.newPrice = newPrice;
 		
 	}
 	
 	@Override
 	public BigDecimal determineDiscountPriceDifference() {
-		return this.productPrice.multiply(new BigDecimal(numProductPer)).subtract(newPrice);
+		return this.product.getPrice().multiply(new BigDecimal(numProductPer)).subtract(newPrice);
 	}
 
 	@Override

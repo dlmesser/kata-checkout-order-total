@@ -12,7 +12,6 @@ import com.kata.checkoutorder.model.ExactPriceSpecial;
 import com.kata.checkoutorder.model.Product;
 import com.kata.checkoutorder.model.Special;
 import com.kata.checkoutorder.model.PercentOffSpecial;
-import com.kata.checkoutorder.model.WeightedProduct;
 
 public class TransactionTest {
 	
@@ -26,18 +25,17 @@ public class TransactionTest {
 	@Before
 	public void setup() {
 		testTransaction = new Transaction();
-		perUnitProduct = new Product("soup", new BigDecimal("1.22"));
-		weightedProduct = new WeightedProduct("bananas", new BigDecimal("1.50"), new BigDecimal("2"));
+		perUnitProduct = new Product("soup", new BigDecimal("1.00"));
+		weightedProduct = new Product("bananas", new BigDecimal("1.50"));
+		weightedProduct.setPounds(new BigDecimal("2"));
 		
-		String itemName = "soup";
-		BigDecimal itemPrice = perUnitProduct.getPrice();
 		int numItemsRequiredToFulfillSpecial = 3;
 		int numDiscounted = 1;
 		BigDecimal percentOff = new BigDecimal("1");
-		percentDiscount = new PercentOffSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
+		percentDiscount = new PercentOffSpecial(perUnitProduct, numItemsRequiredToFulfillSpecial, numDiscounted, percentOff);
 		
 		BigDecimal discountPrice = new BigDecimal("5");
-		exactPriceDiscount = new ExactPriceSpecial(itemName, itemPrice, numItemsRequiredToFulfillSpecial, discountPrice);
+		exactPriceDiscount = new ExactPriceSpecial(perUnitProduct, numItemsRequiredToFulfillSpecial, discountPrice);
 	}
 	
 	private void transactionSecnarioBuilder(Product product, int numToScan) {
@@ -51,7 +49,6 @@ public class TransactionTest {
 		testTransaction.scanProduct(perUnitProduct);
 		
 		assertEquals(1, testTransaction.getProducts().size());
-		
 	}
 	
 	@Test
@@ -66,7 +63,7 @@ public class TransactionTest {
 	public void testScanItem_canAddProductAndUpdateTotal() {
 		testTransaction.scanProduct(perUnitProduct);
 		
-		assertEquals(new BigDecimal("1.22"), testTransaction.getTotal());
+		assertEquals(new BigDecimal("1.00"), testTransaction.getTotal());
 		
 	}
 	
@@ -75,7 +72,7 @@ public class TransactionTest {
 		testTransaction.scanProduct(perUnitProduct);
 		testTransaction.scanProduct(weightedProduct);
 		
-		assertEquals(new BigDecimal("4.22"), testTransaction.getTotal());
+		assertEquals(new BigDecimal("4.00"), testTransaction.getTotal());
 		
 	}
 	
@@ -84,7 +81,7 @@ public class TransactionTest {
 		perUnitProduct.setMarkdown(new BigDecimal("0.50"));
 		testTransaction.scanProduct(perUnitProduct);
 		
-		assertEquals(new BigDecimal("0.72"), testTransaction.getTotal());
+		assertEquals(new BigDecimal("0.50"), testTransaction.getTotal());
 		
 	}
 	
@@ -105,7 +102,7 @@ public class TransactionTest {
 		//setup scenario to fulfill special (3 full price, 1 free)
 		this.transactionSecnarioBuilder(perUnitProduct, 4);
 		
-		assertEquals(new BigDecimal("3.66"), testTransaction.getTotal());
+		assertEquals(new BigDecimal("3.00"), testTransaction.getTotal());
 	}
 	
 	@Test
@@ -116,15 +113,11 @@ public class TransactionTest {
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
 		
-		assertEquals(new BigDecimal("3.66"), testTransaction.getTotal());
+		assertEquals(new BigDecimal("3.00"), testTransaction.getTotal());
 	}
 	
 	@Test
 	public void testAddSpecial_canApplyPercentSpecialWithMultipleDiscountableProducts() {
-		//Change prices for my sanity
-		perUnitProduct.setPrice(new BigDecimal("1.00"));
-		percentDiscount.setProductPrice(new BigDecimal("1.00"));
-		
 		//add special to transaction
 		testTransaction.addSpecial(percentDiscount);
 		
@@ -136,10 +129,6 @@ public class TransactionTest {
 
 	@Test
 	public void testAddSpecial_canApplyPercentWithMultipleDiscountedPerFullPriceRequirement() {
-		//Change prices for my sanity
-		perUnitProduct.setPrice(new BigDecimal("1.00"));
-		percentDiscount.setProductPrice(new BigDecimal("1.00"));
-		
 		//update the M value to be more than 1
 		percentDiscount.setNumDiscountedPer(2);
 		
@@ -170,16 +159,12 @@ public class TransactionTest {
 		//add special to transaction
 		testTransaction.addSpecial(exactPriceDiscount);
 		
-		// 3 for 5 + 1.22 (P.S. - this is a terrible deal)
-		assertEquals(new BigDecimal("6.22"), testTransaction.getTotal());
+		// 3 for 5 + 1.00 (P.S. - this is a terrible deal)
+		assertEquals(new BigDecimal("6.00"), testTransaction.getTotal());
 	}
 	
 	@Test
 	public void testAddSpecial_canApplySpecialsWithLimits() {
-		//Change prices for my sanity
-		perUnitProduct.setPrice(new BigDecimal("1.00"));
-		exactPriceDiscount.setProductPrice(new BigDecimal("1.00"));
-				
 		//setup scenario so special will apply once instead of twice without limit
 		this.transactionSecnarioBuilder(perUnitProduct, 6);
 
@@ -193,10 +178,6 @@ public class TransactionTest {
 	
 	@Test
 	public void testAddSpecial_canApplyPercentOffSpecialsWithLimits() {
-		//Change prices for my sanity
-		perUnitProduct.setPrice(new BigDecimal("1.00"));
-		percentDiscount.setProductPrice(new BigDecimal("1.00"));
-				
 		//setup scenario so special will apply once instead of twice without limit
 		this.transactionSecnarioBuilder(perUnitProduct, 8);
 
@@ -209,12 +190,25 @@ public class TransactionTest {
 	}
 	
 	@Test
+	public void testAddSpecial_canApplyPercentOffSpecialsWithWeightedProduct() {
+		weightedProduct  = new Product("bananas", new BigDecimal("2.00"));
+		weightedProduct.setPounds(new BigDecimal("6"));
+		percentDiscount.setProduct(weightedProduct);
+				
+		testTransaction.scanProduct(weightedProduct);
+		testTransaction.addSpecial(percentDiscount);
+		
+		// 3 pounds full price + 1 pound free + 2 pounds full price
+		assertEquals(new BigDecimal("10").setScale(2), testTransaction.getTotal());
+	}
+	
+	@Test
 	public void testRemoveProduct_canRemoveProductAndUpdateTotal() {
 		this.transactionSecnarioBuilder(perUnitProduct, 4);
-		assertEquals(new BigDecimal("4.88"), testTransaction.getTotal());
+		assertEquals(new BigDecimal("4.00"), testTransaction.getTotal());
 		
 		testTransaction.removeProduct(perUnitProduct);
-		assertEquals(new BigDecimal("3.66"), testTransaction.getTotal());
+		assertEquals(new BigDecimal("3.00"), testTransaction.getTotal());
 		
 	}
 	

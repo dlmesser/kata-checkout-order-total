@@ -5,8 +5,7 @@ import java.util.HashMap;
 
 public abstract class Special {
 	
-	protected String productName;
-	protected BigDecimal productPrice;
+	protected Product product;
 	
 	/** The variable N in 'Buy N get M %X'*/
 	protected int numProductPer;
@@ -22,9 +21,8 @@ public abstract class Special {
 	/** Identifier for if a product has a set limit default value false. */
 	protected boolean hasProductLimit = false;
 	
-	protected Special(String productName, BigDecimal productPrice, int numProductsRequired, int numDiscounted) {
-		this.productName = productName;
-		this.productPrice = productPrice;
+	protected Special(Product product, int numProductsRequired, int numDiscounted) {
+		this.product = product;
 		this.numProductPer = numProductsRequired;
 		this.numDiscountedPer = numDiscounted;
 	}
@@ -55,11 +53,11 @@ public abstract class Special {
 	
 	public BigDecimal updateTotalWithSpecialDiscountValue(HashMap<String, Integer> productCounts, BigDecimal preTaxTotal) {
 		//if we have any of that item special applies to
-		if(productCounts.containsKey(this.productName)) {
-			int specialProductCount = productCounts.get(this.productName);
-			int numberOfProductRequiredToGetDiscount = this.numProductPer;
+		if(productCounts.containsKey(this.product.getName())) {
+			int specialProductCount = productCounts.get(this.product.getName());
+			BigDecimal productPounds = this.product.getPounds();
 			//if we have enough of that item to fulfill special requirements
-			if(numberOfProductRequiredToGetDiscount < specialProductCount) {
+			if(this.numProductPer < specialProductCount || (productPounds != null && this.numProductPer < productPounds.intValue())) {
 				
 				//subtract discounted price difference * number that should have been discounted from price total
 				BigDecimal dicountPriceDifference = this.determineDiscountPriceDifference();
@@ -71,12 +69,12 @@ public abstract class Special {
 		return preTaxTotal;
 	}
 	
-	public String getProductName() {
-		return productName;
+	public Product getProduct() {
+		return product;
 	}
 
-	public void setProductName(String productName) {
-		this.productName = productName;
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public int getNumProductPer() {
@@ -95,14 +93,6 @@ public abstract class Special {
 		this.numDiscountedPer = numDiscounted;
 	}
 	
-	public void setProductPrice(BigDecimal productPrice) {
-		this.productPrice = productPrice;
-	}
-
-	public BigDecimal getProductPrice() {
-		return productPrice;
-	}
-
 	public int getLimit() {
 		return limit;
 	}

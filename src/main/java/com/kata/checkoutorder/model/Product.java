@@ -10,6 +10,7 @@ public class Product {
 	String name;
 	BigDecimal price;
 	BigDecimal markdown;
+	BigDecimal pounds;
 	
 	public Product() {
 	}
@@ -29,6 +30,9 @@ public class Product {
 	}
 
 	public BigDecimal getPrice() {
+		if (pounds != null) {
+			return (price.subtract(markdown)).multiply(pounds);
+		}
 		return price.subtract(markdown);
 	}
 
@@ -42,6 +46,14 @@ public class Product {
 
 	public void setMarkdown(BigDecimal markdown) {
 		this.markdown = markdown;
+	}
+	
+	public BigDecimal getPounds() {
+		return pounds;
+	}
+
+	public void setPounds(BigDecimal pounds) {
+		this.pounds = pounds;
 	}
 
 	@Override
