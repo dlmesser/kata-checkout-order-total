@@ -192,6 +192,23 @@ public class TransactionTest {
 	}
 	
 	@Test
+	public void testAddSpecial_canApplyPercentOffSpecialsWithLimits() {
+		//Change prices for my sanity
+		perUnitProduct.setPrice(new BigDecimal("1.00"));
+		percentDiscount.setProductPrice(new BigDecimal("1.00"));
+				
+		//setup scenario so special will apply once instead of twice without limit
+		this.transactionSecnarioBuilder(perUnitProduct, 8);
+
+		//add special to transaction
+		percentDiscount.setLimit(4);
+		testTransaction.addSpecial(percentDiscount);
+		
+		// 3 + 1 free + 4
+		assertEquals(new BigDecimal("7").setScale(2), testTransaction.getTotal());
+	}
+	
+	@Test
 	public void testRemoveProduct_canRemoveProductAndUpdateTotal() {
 		this.transactionSecnarioBuilder(perUnitProduct, 4);
 		assertEquals(new BigDecimal("4.88"), testTransaction.getTotal());

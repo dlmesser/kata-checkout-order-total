@@ -37,7 +37,7 @@ public class PercentOffSpecial extends Special {
 				for(int j = 0; j < this.numDiscountedPer; j++) {
 					//make sure to not mark more discounted than exist....
 					
-					if (i < productCount) {
+					if (i < limit) {
 						currentItemsDiscounted++;
 						i++;
 					}

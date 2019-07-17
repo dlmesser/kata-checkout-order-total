@@ -79,6 +79,10 @@ public class Transaction {
 		updateTotal();
 	}
 	
+	/**
+	 * Removes a product from the current transaction.
+	 * @param product to be removed
+	 */
 	public void removeProduct(Product product) {
 		String productName = product.getName();
 		if(products.remove(product)) {
